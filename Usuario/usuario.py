@@ -11,7 +11,7 @@ class Usuario(Db):
     def create(self):
         values = json.loads(request.data.decode("utf-8"))
         try:
-            self.cursor.execute(f"""INSERT INTO Usuarios VALUES('{str(uuid4())[0:8]}', '{values['Nome']}', 
+            self.cursor.execute(f"""INSERT INTO usuarios VALUES('{str(uuid4())[0:8]}', '{values['Nome']}', 
                                 '{values['Cpf'].replace(".", "").replace("-", "")}',
                                 '{values['Email']}', '{values['Fone']}',
                                 '{datetime.strftime(datetime.now(), '%d/%m/%Y  %H:%M:%S')}', '{'Never'}')""")
@@ -28,7 +28,7 @@ class Usuario(Db):
             sql_list.append(f"{key} = '{value}'")
         
         try:
-            self.cursor.execute(f"""UPDATE Usuarios SET {', '.join(sql_list)},
+            self.cursor.execute(f"""UPDATE usuarios SET {', '.join(sql_list)},
                                 Atualizado_em = '{datetime.strftime(datetime.now(), '%d/%m/%Y %H%M%S')}',
                                 WHERE Id = '{value['Id']}'""")
             
@@ -39,7 +39,7 @@ class Usuario(Db):
         return "Não foi possível atualizar este usuário.", 400
     
     def get_all(self):
-        self.cursor.execute(f"SELECT * FROM Usuarios")
+        self.cursor.execute(f"SELECT * FROM usuarios")
         columns = [i[0] for i in self.cursor.description]
         df = pd.DataFrame(self.cursor.fetchall(), columns=columns)
         
@@ -49,7 +49,7 @@ class Usuario(Db):
         values = json.loads(request.data.decode("utf-8"))
         
         try:
-            self.cursor.execute(f"SELECT * FROM Usuarios WHERE Id= {id}")
+            self.cursor.execute(f"SELECT * FROM usuarios WHERE Id= {id}")
             columns = [i[0] for i in self.cursor.description]
             df = pd.DataFrame(self.cursor.fetch_one(), columns=columns)
             
@@ -63,7 +63,7 @@ class Usuario(Db):
         values = json.loads(request.data.decode("utf-8"))
         
         try:
-            self.cursor.execute(f"DELETE * FROM Usuarios WHERE Id = {id}")
+            self.cursor.execute(f"DELETE * FROM usuarios WHERE Id = {id}")
             return "Deletado.", 204
         
         except Exception as Error:

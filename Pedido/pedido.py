@@ -8,11 +8,13 @@ class Pedido(Db):
     
     def create(self):
         values = json.loads(request.data.decode("utf-8"))
+        valor_total = f"{values['Quantidade']*values['Preco']}"
+        
         try:
-            self.cursor.execute(f"""INSERT INTO Pedidos VALUES ({str(uuid4())[0:8]},
+            self.cursor.execute(f"""INSERT INTO pedidos VALUES ({str(uuid4())[0:8]},
                                 {values['Id_Usuario']}, {values['Descricao']}, 
                                 {values['Quantidade']}, {values['Preco']},
-                                {values['Quantidade']*values['Preco']},
+                                {values['valor_total']},
                                 {datetime.strftime(datetime.now(), '%d/%m/%Y %H:%M:%S')}, "Never")""")
             return "Pedido realizado.",
             
@@ -28,7 +30,7 @@ class Pedido(Db):
             sql_list.append(f"{key} = '{value}'")
         
         try:
-            self.cursor.excecute(f"""UPDATE Pedidos SET {', '.join(sql_list)},
+            self.cursor.excecute(f"""UPDATE pedidos SET {', '.join(sql_list)},
                                  Atualizado_em = '{datetime.strftime(datetime.now(), '%d/%m/%Y %H:%M:%S')}',
                                  WHERE Id= '{value['Id']}'""")
             return "Atualizado com sucesso.", 200
@@ -38,7 +40,7 @@ class Pedido(Db):
         return "Não foi possível atualizar.", 400
     
     def get_all(self):
-        self.cursor.excecute("SELECT * FROM Pedidos")
+        self.cursor.excecute("SELECT * FROM pedidos")
         columns = [i[0] for i in self.cursor.description]
         df = pd.DataFrame(self.cursor.fetchall(), columns=columns)
         
@@ -48,7 +50,7 @@ class Pedido(Db):
         values = json.loads(request.data.decode("utf-8"))
         
         try:
-            self.cursor.excecute(f"SELECT * FROM Pedidos WHERE Id = {id}")
+            self.cursor.excecute(f"SELECT * FROM pedidos WHERE Id = {id}")
         
         except Exception as Error:
             return str(Error.args)
@@ -58,7 +60,7 @@ class Pedido(Db):
         values = json.loads(request.data.decode("utf-8"))
         
         try:
-            self.cursor.excecute(f"DELETE * FROM Pedidos WHERE Id = {id}")
+            self.cursor.excecute(f"DELETE * FROM pedidos WHERE Id = {id}")
             return "Deletado.", 204
             
         except Exception as Error:
