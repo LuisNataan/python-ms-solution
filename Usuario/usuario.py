@@ -20,7 +20,7 @@ class Usuario(Db):
             return str(Error.args)
         return "Não foi possível cadastrar este usuário.", 400
     
-    def update(self):
+    def update(self, id):
         values = json.loads(request.data.decode("utf-8"))
         sql_list = []
         
