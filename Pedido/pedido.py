@@ -22,7 +22,7 @@ class Pedido(Db):
             return str(Error.args)
         return "Não foi possível realizar este pedido.", 400
     
-    def update(self, id):
+    def update(self, dicio):
         values = json.loads(request.data.decode("utf-8"))
         sql_list = []
         
@@ -32,7 +32,7 @@ class Pedido(Db):
         try:
             self.cursor.excecute(f"""UPDATE pedidos SET {', '.join(sql_list)},
                                  Atualizado_em = '{datetime.strftime(datetime.now(), '%d/%m/%Y %H:%M:%S')}',
-                                 WHERE Id= '{value['Id']}'""")
+                                 WHERE Id= '{dicio['Id']}'""")
             return "Atualizado com sucesso.", 200
             
         except Exception as Error:
@@ -60,7 +60,7 @@ class Pedido(Db):
         values = json.loads(request.data.decode("utf-8"))
         
         try:
-            self.cursor.excecute(f"DELETE * FROM pedidos WHERE Id = {id}")
+            self.cursor.excecute(f"DELETE FROM pedidos WHERE Id = {id}")
             return "Deletado.", 204
             
         except Exception as Error:

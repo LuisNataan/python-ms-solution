@@ -9,28 +9,27 @@ import pandas as pd
 class Usuario(Db):
     
     def create(self):
-        values = json.loads(request.data.decode("utf-8"))
+        
         try:
-            self.cursor.execute(f"""INSERT INTO usuarios VALUES('{str(uuid4())[0:8]}', '{values['Nome']}', 
+            sql = f"""INSERT INTO usuarios VALUES('{str(uuid4())[0:8]}', '{values['Nome']}', 
                                 '{values['Cpf'].replace(".", "").replace("-", "")}',
-                                '{values['Email']}', '{values['Fone']}',
-                                '{datetime.strftime(datetime.now(), '%d/%m/%Y  %H:%M:%S')}', '{'Never'}')""")
+                                '{values['Email']}', '{values['Fone']}', default, default)"""
+            print(sql)
+            self.cursor.execute(sql)
             return "Cadastrado com sucesso.", 201
         except Exception as Error:
             return str(Error.args)
         return "Não foi possível cadastrar este usuário.", 400
     
-    def update(self, id):
-        values = json.loads(request.data.decode("utf-8"))
+    def update(self, dicio):
         sql_list = []
         
-        for key, value in values['set'].items():
-            sql_list.append(f"{key} = '{value}'")
+        for key, value in dicio.items():
+            sql_list.append(f"{key}='{value}'")
+        print(sql_list)
         
         try:
-            self.cursor.execute(f"""UPDATE usuarios SET {', '.join(sql_list)},
-                                Atualizado_em = '{datetime.strftime(datetime.now(), '%d/%m/%Y %H%M%S')}',
-                                WHERE Id = '{value['Id']}'""")
+            self.cursor.execute(f"""UPDATE usuarios SET {','.join(sql_list)} WHERE Id = '{dicio['Id']}'""")
             
             return "Atualizado com sucesso.", 200
             
@@ -45,25 +44,21 @@ class Usuario(Db):
         
         return df.to_json(orient="records")
     
-    def get_by_id(self, id):
-        values = json.loads(request.data.decode("utf-8"))
-        
+    def get_by_id(self, dicio):
         try:
-            self.cursor.execute(f"SELECT * FROM usuarios WHERE Id= {id}")
+            self.cursor.execute(f"SELECT * FROM usuarios WHERE Id= '{dicio['Id']}'")
             columns = [i[0] for i in self.cursor.description]
-            df = pd.DataFrame(self.cursor.fetch_one(), columns=columns)
-            
+            df = pd.DataFrame(self.cursor.fetchall(), columns=columns)
+            print(id)
             return df.to_json(orient="records")
             
         except Exception as Error:
             return str(Error.args)
         return "Id inexistente ou inválido.", 404
     
-    def delete(self, id):
-        values = json.loads(request.data.decode("utf-8"))
-        
+    def delete(self, dicio):
         try:
-            self.cursor.execute(f"DELETE * FROM usuarios WHERE Id = {id}")
+            self.cursor.execute(f"DELETE FROM usuarios WHERE Id = '{dicio['Id']}'")
             return "Deletado.", 204
         
         except Exception as Error:
